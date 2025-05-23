@@ -4,7 +4,7 @@ import { type ActionType, type TypeContext, type DefaultState } from "./types";
 const initialState: DefaultState = {
   count: 0,
   status: "Pending...",
-  theme: "default",
+  theme: "light",
 };
 
 const reducer = (state: DefaultState, action: ActionType): DefaultState => {
@@ -18,7 +18,6 @@ const reducer = (state: DefaultState, action: ActionType): DefaultState => {
     case "setStatus":
       return { ...state, status: action.payload };
     case "setTheme":
-      document.documentElement.className = action.payload;
       localStorage.setItem("userPreferredTheme", action.payload);
       return { ...state, theme: action.payload };
     default: {

@@ -1,7 +1,7 @@
 // type for our default state
 export type DefaultState = {
   count: number;
-  theme: "dark" | "default";
+  theme: "dark" | "light";
   status: string;
 };
 
@@ -15,7 +15,7 @@ export type SetStatusAction = {
 };
 export type SetThemeAction = {
   type: "setTheme";
-  payload: "default" | "dark";
+  payload: "light" | "dark";
 };
 
 // Union type for all the actions
