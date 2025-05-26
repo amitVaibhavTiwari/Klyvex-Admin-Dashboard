@@ -7,6 +7,7 @@ import HomePage from "./pages/home";
 import { useGlobalContext } from "./lib/GlobalContext";
 import { theme as lightTheme } from '../theme/LightTheme'
 import { theme as darkTheme } from '../theme/DarkTheme'
+import AdminLayout from "./components/AppLayout/AppLayout";
 
 const App = () => {
   const queryClient = new QueryClient({
@@ -23,7 +24,7 @@ const App = () => {
   const router = createBrowserRouter([
     {
       path: "/",
-      element: <HomePage />,
+      element:<AdminLayout/>,
 
       children: [
         {
