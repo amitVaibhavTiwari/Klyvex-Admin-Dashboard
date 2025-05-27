@@ -1,4 +1,3 @@
-// theme/darkTheme.js
 import { createTheme } from "@mui/material/styles";
 import { colors } from "./colors";
 
