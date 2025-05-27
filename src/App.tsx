@@ -11,6 +11,7 @@ import Error from "./components/Error/Error";
 import CustomersPage from "./pages/Customers/Index";
 import SettingsPage from "./pages/Settings/Index";
 import OrdersPage from "./pages/Orders/Index";
+import AppProvider from "./components/AppProvider/AppProvider";
 
 const App = () => {
   const queryClient = new QueryClient({
@@ -69,7 +70,9 @@ const App = () => {
   return (
     <QueryClientProvider client={queryClient}>
       <ThemeProvider theme={theme == "dark" ? darkTheme : lightTheme}>
-        <RouterProvider router={router} />
+        <AppProvider>
+          <RouterProvider router={router} />
+        </AppProvider>
         <ReactQueryDevtools initialIsOpen={false} />
       </ThemeProvider>
     </QueryClientProvider>

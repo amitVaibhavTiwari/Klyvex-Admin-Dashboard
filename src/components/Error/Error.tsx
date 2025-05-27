@@ -36,10 +36,10 @@ const Error = () => {
                     width="100%"
                     textAlign="center"
                 >
-                    <Typography variant="h2" fontWeight={800}>
+                    <Typography color="textPrimary" variant="h2" fontWeight={800}>
                         Uh Oh!
                     </Typography>
-                    <Typography variant="h6">
+                    <Typography color="textSecondary" variant="h6">
                         {is404
                             ? "The page you are looking for is either missing or you assembled the link incorrectly."
                             : `Something went unexpectedly wrong. Refresh the page or try again later. If the problem continues, contact support.`}
