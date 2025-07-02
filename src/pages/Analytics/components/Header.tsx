@@ -14,14 +14,14 @@ const Header = () => {
                 <Typography
                     sx={{ letterSpacing: ".5px" }}
                     color={theme.palette.text.primary}
-                    variant="h1"
+                    variant="h3"
                     fontWeight={800}
                     gutterBottom
                 >
-                    Dashboard Overview
+                    Store Analytics
                 </Typography>
                 <Typography variant="body1" color="text.secondary">
-                    Welcome back! Here's what's happening with your store today.
+                    See what's happening with your store today.
                 </Typography>
             </Box>
 

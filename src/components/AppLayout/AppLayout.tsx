@@ -1,4 +1,4 @@
-import { useState, MouseEvent } from "react";
+import { useState, MouseEvent, useEffect } from "react";
 import {
     Box,
     Drawer,
@@ -39,7 +39,7 @@ import { RouteItem, routes } from "./Routes";
 const drawerWidth = 260;
 const collapsedWidth = 60;
 
-interface AdminLayoutProps {
+type AdminLayoutProps = {
     children?: React.ReactNode;
     title?: string;
 }
@@ -51,8 +51,9 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, title = "" }) => {
     const [anchorEl, setAnchorEl] = useState<null | HTMLElement>(null);
     const [activeRoute, setActiveRoute] = useState<string>("/");
     const [openSubMenu, setOpenSubMenu] = useState<number | null>(null);
+    const [checkingUser, setCheckingUser] = useState<boolean>(true)
 
-    const { dispatch, theme: colorTheme } = useGlobalContext();
+    const { dispatch, theme: colorTheme, user } = useGlobalContext();
     const navigate = useNavigate()
 
     const handleDrawerToggle = () => setOpen(!open);
@@ -89,6 +90,17 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, title = "" }) => {
     const drawerBgActive = primaryColor;
     const drawerTextActive = theme.palette.primary.contrastText;
     const drawerInactiveText = theme.palette.text.primary;
+
+
+    useEffect(() => {
+        if (!user) {
+            navigate("/login")
+        } else {
+            setCheckingUser(false)
+        }
+    }, [])
+
+    if (checkingUser) return null
 
     const drawer = (
         <Box
@@ -191,7 +203,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, title = "" }) => {
                                                     sx={{
                                                         borderLeft: `4px solid ${activeRoute === subRoute.path
                                                             ? drawerBgActive
-                                                            : "transparent"
+                                                            : theme.palette.grey[300]
                                                             }`,
                                                         ml: 3.5,
                                                         mb: 0.25,
@@ -357,12 +369,7 @@ const AdminLayout: React.FC<AdminLayoutProps> = ({ children, title = "" }) => {
                             </ListItemIcon>
                             Profile
                         </MenuItem>
-                        <MenuItem onClick={handleProfileMenuClose}>
-                            <ListItemIcon>
-                                <FiSettings size={16} />
-                            </ListItemIcon>
-                            Account Settings
-                        </MenuItem>
+
                         <Divider />
                         <MenuItem onClick={handleProfileMenuClose}>
                             <ListItemIcon>

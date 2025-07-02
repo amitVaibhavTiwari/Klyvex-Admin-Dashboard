@@ -1,0 +1,7 @@
+pages need to refactored for UI
+
+Customer
+Orders
+Products (little refactored, more need to be) . Use the header, filters and pagination UI similar to this pg for all pages.
+add product pg 
+staff page

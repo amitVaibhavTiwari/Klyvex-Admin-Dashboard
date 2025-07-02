@@ -1,18 +1,758 @@
-import { Box, Typography } from "@mui/material"
-import { PageChanger } from "../../components/PageChanger/PageChanger"
+import React, { useState } from 'react';
+import {
+    Box,
+    Paper,
+    Table,
+    TableBody,
+    TableCell,
+    TableContainer,
+    TableHead,
+    TableRow,
+    Typography,
+    Chip,
+    IconButton,
+    TextField,
+    FormControl,
+    InputLabel,
+    Select,
+    MenuItem,
+    Button,
+    Stack,
+    Avatar,
+    Tooltip,
+    Card,
+    CardContent,
+    Grid,
+    InputAdornment,
+    Badge,
+    LinearProgress
+} from '@mui/material';
+import {
+    FiFilter,
+    FiDownload,
+    FiEye,
+    FiEdit,
+    FiSearch,
+    FiUsers,
+    FiShoppingBag,
+    FiDollarSign,
+    FiTrendingUp,
+    FiMoreVertical,
+    FiMail,
+    FiPhone,
+    FiMapPin,
+    FiCalendar,
+    FiStar,
+    FiUserPlus
+} from 'react-icons/fi';
 
-const CustomersPage = () => {
+// Enhanced mock customer data
+const customers = [
+    {
+        id: 1,
+        name: 'Sarah Johnson',
+        email: 'sarah.johnson@gmail.com',
+        phone: '+1 (555) 123-4567',
+        tier: 'Premium',
+        status: 'Active',
+        joinDate: '2023-03-15',
+        location: 'New York, NY',
+        totalOrders: 24,
+        totalSpent: 3299.99,
+        avgOrderValue: 137.50,
+        lastOrder: '2024-06-08',
+        tags: ['VIP', 'Frequent Buyer']
+    },
+    {
+        id: 2,
+        name: 'Michael Chen',
+        email: 'michael.chen@outlook.com',
+        phone: '+1 (555) 234-5678',
+        tier: 'Gold',
+        status: 'Active',
+        joinDate: '2023-07-22',
+        location: 'Los Angeles, CA',
+        totalOrders: 18,
+        totalSpent: 2199.50,
+        avgOrderValue: 122.19,
+        lastOrder: '2024-06-07',
+        tags: ['Loyal Customer']
+    },
+    {
+        id: 3,
+        name: 'Emily Rodriguez',
+        email: 'emily.rodriguez@yahoo.com',
+        phone: '+1 (555) 345-6789',
+        tier: 'Silver',
+        status: 'Active',
+        joinDate: '2024-01-10',
+        location: 'Chicago, IL',
+        totalOrders: 8,
+        totalSpent: 899.99,
+        avgOrderValue: 112.50,
+        lastOrder: '2024-06-06',
+        tags: ['New Customer']
+    },
+    {
+        id: 4,
+        name: 'David Thompson',
+        email: 'david.thompson@gmail.com',
+        phone: '+1 (555) 456-7890',
+        tier: 'Premium',
+        status: 'Active',
+        joinDate: '2022-11-05',
+        location: 'Miami, FL',
+        totalOrders: 32,
+        totalSpent: 4599.00,
+        avgOrderValue: 143.72,
+        lastOrder: '2024-06-05',
+        tags: ['VIP', 'High Value']
+    },
+    {
+        id: 5,
+        name: 'Jessica Williams',
+        email: 'jessica.williams@hotmail.com',
+        phone: '+1 (555) 567-8901',
+        tier: 'Gold',
+        status: 'Inactive',
+        joinDate: '2023-09-18',
+        location: 'Seattle, WA',
+        totalOrders: 12,
+        totalSpent: 1299.99,
+        avgOrderValue: 108.33,
+        lastOrder: '2024-04-15',
+        tags: ['At Risk']
+    },
+    {
+        id: 6,
+        name: 'Alex Kim',
+        email: 'alex.kim@gmail.com',
+        phone: '+1 (555) 678-9012',
+        tier: 'Silver',
+        status: 'Active',
+        joinDate: '2024-02-28',
+        location: 'Austin, TX',
+        totalOrders: 6,
+        totalSpent: 679.99,
+        avgOrderValue: 113.33,
+        lastOrder: '2024-06-04',
+        tags: ['Growing']
+    },
+    {
+        id: 7,
+        name: 'Rachel Davis',
+        email: 'rachel.davis@outlook.com',
+        phone: '+1 (555) 789-0123',
+        tier: 'Premium',
+        status: 'Active',
+        joinDate: '2022-08-12',
+        location: 'Boston, MA',
+        totalOrders: 28,
+        totalSpent: 3899.99,
+        avgOrderValue: 139.29,
+        lastOrder: '2024-06-03',
+        tags: ['VIP', 'Brand Advocate']
+    },
+    {
+        id: 8,
+        name: 'Ryan Martinez',
+        email: 'ryan.martinez@gmail.com',
+        phone: '+1 (555) 890-1234',
+        tier: 'Bronze',
+        status: 'Active',
+        joinDate: '2024-05-20',
+        location: 'Denver, CO',
+        totalOrders: 3,
+        totalSpent: 299.99,
+        avgOrderValue: 100.00,
+        lastOrder: '2024-06-02',
+        tags: ['New Customer']
+    }
+];
+
+const getTierColor = (tier) => {
+    const colors = {
+        Premium: 'warning',
+        Gold: 'secondary',
+        Silver: 'info',
+        Bronze: 'default'
+    };
+    return colors[tier] || 'default';
+};
+
+const getStatusColor = (status) => {
+    const colors = {
+        Active: 'success',
+        Inactive: 'error',
+        Pending: 'warning'
+    };
+    return colors[status] || 'default';
+};
+
+const formatCurrency = (amount) => {
+    return new Intl.NumberFormat('en-US', {
+        style: 'currency',
+        currency: 'USD'
+    }).format(amount);
+};
+
+const formatDate = (dateString) => {
+    return new Date(dateString).toLocaleDateString('en-US', {
+        month: 'short',
+        day: 'numeric',
+        year: 'numeric'
+    });
+};
+
+export default function CustomersPage() {
+    const [searchTerm, setSearchTerm] = useState('');
+    const [tierFilter, setTierFilter] = useState('all');
+    const [statusFilter, setStatusFilter] = useState('all');
+
+    const stats = {
+        totalCustomers: customers.length,
+        activeCustomers: customers.filter(c => c.status === 'Active').length,
+        totalRevenue: customers.reduce((sum, customer) => sum + customer.totalSpent, 0),
+        avgLifetimeValue: customers.reduce((sum, customer) => sum + customer.totalSpent, 0) / customers.length
+    };
+
     return (
-        <PageChanger>
-            <Box sx={{ minHeight: "100vh" }}>
-                <Typography variant="h1">
-
-                    This is Customers page
+        <Box sx={{ p: 3, bgcolor: 'background.default', minHeight: '100vh' }}>
+            {/* Header Section */}
+            <Box sx={{ mb: 4 }}>
+                <Typography
+                    variant="h4"
+                    component="h1"
+                    gutterBottom
+                    sx={{
+                        fontWeight: 700,
+                        color: 'text.primary',
+                        mb: 1
+                    }}
+                >
+                    Customer Management
                 </Typography>
-                Lorem ipsum, dolor sit amet consectetur adipisicing elit. Dolores earum, hic, praesentium unde dolore iure rerum nam aspernatur mollitia explicabo autem exercitationem aut at eligendi minima obcaecati voluptatem nesciunt rem minus tempora ab placeat soluta corrupti! Harum quae velit, provident dicta cumque blanditiis. Hic cumque quibusdam laborum alias odit adipisci molestias eligendi reiciendis saepe delectus necessitatibus provident praesentium temporibus facere, recusandae repudiandae minima pariatur at ab asperiores dolores aut rerum? Et commodi autem accusamus voluptates ipsa quae necessitatibus ab in, dolorum voluptatibus aut dignissimos explicabo magnam. Natus quae quisquam praesentium reprehenderit minima libero, ab itaque porro provident ad consectetur molestias quo! Quia deserunt tenetur rem sit nulla reiciendis qui nesciunt consectetur voluptatibus at quos placeat, sunt id aspernatur cumque amet magnam exercitationem harum! Cum velit, aliquid nam ullam corrupti qui iste molestias! Obcaecati totam doloribus, culpa veritatis error fugit accusantium consectetur magnam corporis voluptates illum. Labore necessitatibus velit iure temporibus repellendus modi assumenda possimus nam dicta animi corporis, rem officia accusamus non nobis, facilis aspernatur cupiditate suscipit distinctio eius doloribus reprehenderit repudiandae similique impedit? Odit officia praesentium nostrum. Nobis ullam dolore numquam repudiandae. Dolorem itaque sed harum, quos beatae quidem ducimus at, nostrum est exercitationem saepe recusandae eveniet, eum inventore. Lorem ipsum dolor sit amet, consectetur adipisicing elit. Hic, laudantium perspiciatis consequuntur autem quasi mollitia molestias non. Culpa, laudantium. Eveniet repudiandae quia quae harum, architecto doloremque at dicta voluptates sequi esse tempora aliquam recusandae obcaecati praesentium ut vitae sapiente deleniti! Similique nisi praesentium aut omnis voluptatem molestiae a rem animi itaque. Possimus, impedit beatae ipsum velit exercitationem consequuntur corporis autem rerum laborum nulla quasi laboriosam eligendi, quidem quisquam, error modi fuga obcaecati repellat quae! Nesciunt ad, nam voluptatum, obcaecati nisi ab aut in quia qui sequi esse officia molestias aspernatur dolores animi natus sapiente, ducimus maiores accusamus? Magni facilis consequatur obcaecati tempora, praesentium dolore sapiente, quae nulla tempore officia fugiat aliquid. Possimus deleniti distinctio ullam dolorum optio alias eaque, atque blanditiis officia quidem, a magni labore aliquam reiciendis, corrupti aliquid? Dolore earum corporis beatae autem necessitatibus, nihil, sapiente doloribus ut unde expedita eum accusamus minus quia delectus magni iure. Dolores laudantium voluptas reiciendis blanditiis odio mollitia unde corrupti. Dolores minus aspernatur repellendus temporibus reiciendis facilis adipisci sapiente nam maxime assumenda nemo cum, tempore quos eligendi aperiam eveniet consectetur sit. Consequuntur ipsam repellat consequatur quae ipsum enim dicta tempora ratione. Dolorum voluptates nam consectetur, temporibus consequuntur deserunt! Sapiente quo nisi quidem deleniti libero eum aperiam amet, facere, eligendi nam tempora pariatur enim laborum? Dolor, facilis quisquam culpa ullam natus voluptates vel possimus est id fugiat ipsum iste repellendus. Voluptatum autem ut molestias mollitia neque nihil. Animi distinctio tenetur fugit repudiandae dignissimos deserunt itaque magnam maxime numquam. Ad praesentium temporibus perferendis eaque a ut neque dolore quo eveniet, optio voluptate iusto, doloribus expedita eos molestiae. Libero eveniet deserunt debitis maiores quia expedita? Nostrum, praesentium! Sunt dolores sit odio totam unde in iste sapiente, dolor qui quibusdam et, mollitia aliquid magnam, quod rem ratione impedit illum nihil. Molestias minus perferendis, amet voluptatem soluta minima tenetur officiis ab sequi atque ad sint quae! Amet a fugiat eum voluptas odio velit veniam id dignissimos, incidunt enim mollitia omnis nihil provident corporis ratione tenetur? Totam, sapiente doloremque obcaecati ea quasi facilis expedita molestiae possimus, suscipit consequatur voluptatum nisi molestias, quod eveniet officiis itaque. Similique exercitationem repudiandae placeat pariatur, saepe quibusdam eum possimus nihil perspiciatis deleniti molestias harum perferendis ex aliquid doloremque porro. Aperiam saepe iste ad expedita maxime! Esse nostrum nesciunt sapiente incidunt, consectetur iste voluptate facere voluptates, id, fuga nihil qui dolorum consequatur itaque nam. Consequuntur excepturi neque obcaecati officiis? Quae quaerat animi dolorum cupiditate expedita praesentium, esse vero iste omnis officia eveniet quos distinctio facilis? Ab adipisci magnam consequatur eius laborum deleniti commodi veniam quos incidunt ducimus nihil doloribus pariatur facilis aliquid non odio perspiciatis voluptatibus vel in tempora quas voluptate nam, dolorem at? Molestiae aliquid suscipit incidunt velit saepe, eligendi inventore aspernatur corrupti est, quas molestias culpa impedit voluptatibus odio voluptatem veritatis perferendis reprehenderit nemo laborum porro iste ipsa minus ad nostrum. Odio non aspernatur dolor libero necessitatibus nihil. Error perspiciatis repellendus quia quod quibusdam expedita iusto, ipsa neque nostrum, consequuntur, pariatur fugiat? Impedit, ullam deleniti, iusto facere necessitatibus similique culpa obcaecati ex optio laudantium dolore voluptas itaque earum tempore officia totam aspernatur alias dignissimos fugit provident distinctio. Aliquam dolor cumque sapiente modi asperiores sed delectus omnis nulla ipsa quasi. Distinctio quisquam optio accusantium, ut veritatis quae aut asperiores rem soluta cupiditate quo amet quasi laudantium fugit praesentium facilis possimus magnam necessitatibus! Accusantium, veritatis voluptas quibusdam eius saepe ut ratione eaque explicabo laudantium error ea aut quaerat. Ducimus consequatur et neque? Blanditiis molestiae beatae corporis praesentium ipsum ratione, commodi porro sed a magni molestias vitae perferendis iusto nesciunt, amet aliquid eos aspernatur earum odio quisquam, fugit quos voluptatum? Neque, dolores ab! Sequi molestiae fugit vero optio ipsa consequatur, assumenda, beatae deserunt corporis repellat placeat incidunt! Vitae quaerat earum quis nobis reprehenderit corrupti placeat maxime, nostrum totam mollitia magnam reiciendis porro libero quasi eius veniam nam praesentium error maiores soluta dolorum ad? Mollitia ad, velit aperiam, at nisi eos debitis porro harum explicabo officia incidunt nesciunt amet quaerat hic modi cumque recusandae ab ipsam temporibus odit doloribus. Reiciendis, et quia totam ea quos officiis. Voluptatibus, mollitia iusto. Quaerat tempora veniam odio suscipit quidem autem, quisquam similique reprehenderit vero praesentium quod cum tenetur minus doloribus dolore nesciunt consectetur perspiciatis ullam, sit debitis? Delectus laboriosam voluptatibus est atque. Quaerat voluptatem natus cumque nobis magnam in quam, libero, amet, ea aut illum assumenda enim harum incidunt omnis dolor quod nam magni. Soluta suscipit eaque doloremque consequuntur consequatur sit, qui, at non voluptate quisquam reiciendis tenetur hic debitis, quod dolorum commodi officia itaque nulla optio! Tempora, magnam similique fugit dolorum quod quisquam consectetur cupiditate impedit dolore, mollitia asperiores? Tenetur aspernatur eligendi repudiandae quisquam incidunt non error eius. Quis, beatae ipsa minus similique fuga eos ducimus libero dignissimos doloremque autem unde explicabo nam, voluptas magni ullam iusto aperiam, aliquam nostrum reprehenderit minima. Cum qui ullam perspiciatis accusantium a fugiat ipsum aliquam hic velit voluptate blanditiis nihil amet dolorem exercitationem veritatis perferendis, itaque atque rerum minima quisquam magni, natus totam. Accusamus ipsam vel eaque, soluta sed numquam repudiandae ea porro assumenda et molestias voluptatem harum cumque quo necessitatibus, dolorem in! Id quis sunt incidunt, illum eos laboriosam itaque corporis inventore, magnam saepe non voluptates animi provident maxime accusamus! Saepe cum laborum exercitationem. Enim ipsa ea unde ab facere quas, quae ad illum eos fuga molestiae sit a, neque tempora excepturi eligendi nulla cupiditate adipisci provident. Distinctio corporis assumenda fugiat. Dignissimos dolores velit commodi voluptas nobis incidunt doloremque necessitatibus possimus doloribus, vitae facere? Itaque, odit aut. Cum, esse recusandae consectetur deserunt explicabo animi, nemo quod nihil nulla ab eum officiis blanditiis? Odio officia asperiores voluptate eius voluptates tenetur aut, inventore minima numquam molestias ratione, expedita quos. Beatae tenetur eius aspernatur. Ut quo natus facere iste, error sapiente vel maxime eius ex facilis! Rerum hic provident repellendus omnis repellat sequi! Ut qui laudantium voluptas dolorem, maiores delectus ad, dolores quidem libero porro voluptatem quo harum possimus inventore reprehenderit iusto illum ab reiciendis impedit, consequatur deserunt neque blanditiis. Consequatur iure necessitatibus placeat nesciunt sint rerum laudantium dolor accusantium. Repellendus, ratione. Quae voluptatem repellat, fugiat adipisci vel aut aliquam blanditiis culpa quod? Itaque sequi quo laboriosam at suscipit. Ullam voluptates vitae quaerat non architecto sapiente est quasi distinctio sit accusantium corrupti suscipit numquam quae perferendis, culpa excepturi repudiandae. Maxime libero architecto cum repellat aperiam quae aut voluptates aspernatur nesciunt blanditiis tempore ducimus quaerat molestias natus odit, placeat vel doloribus! Iure ipsum ipsam officia distinctio non, eius excepturi accusamus necessitatibus praesentium quam, modi qui repellendus odit quod repudiandae? Labore sit neque dolorum consequuntur magnam, inventore delectus magni error nemo expedita iusto ipsum tenetur, veniam nam voluptas fugiat saepe, aspernatur a rerum. Quos laudantium rem deserunt consectetur doloremque rerum eum impedit qui labore ipsa voluptatibus eius optio, nostrum saepe excepturi dolorem debitis molestiae? Voluptas porro recusandae tempora tempore provident optio, nihil earum dolor molestias ex distinctio magni ducimus cumque, incidunt nisi perferendis quaerat numquam libero dignissimos rem pariatur sint velit? Inventore molestias ipsa illum pariatur animi praesentium sed tempora eaque, libero, exercitationem, dolore dignissimos. Et laudantium tempore numquam possimus minus. Unde impedit doloremque hic aspernatur nihil vitae eligendi facere voluptates. Et ab ipsa eos. Omnis nobis porro iste quidem laborum laboriosam quia earum aut, ratione nulla suscipit? Eligendi inventore voluptatibus odit quos eius perspiciatis architecto praesentium nobis excepturi nulla voluptatem eveniet fugit exercitationem ipsum laboriosam modi veritatis ipsam labore saepe minima, officiis tenetur optio molestias? Perspiciatis pariatur aut inventore reprehenderit aliquam facilis alias! Corporis harum accusamus quibusdam? Obcaecati recusandae voluptas eligendi, pariatur perferendis veritatis, eos nesciunt expedita velit ullam eveniet dolorem delectus, atque minus? Fuga et ea nobis, beatae, iure sunt atque natus temporibus ut aliquam accusamus iste facilis consectetur laboriosam. Ipsum, voluptatem? Laborum debitis tempora quia quisquam a eius dolores, nihil, id accusantium animi, ab atque asperiores neque qui amet dicta rerum dolor illum non adipisci obcaecati error. Vitae laboriosam asperiores maiores quaerat unde nostrum ea illo sint est! Minus exercitationem laudantium sint excepturi enim numquam illum laboriosam consequuntur quod. Ex autem unde distinctio tempora delectus rerum deleniti cupiditate sequi recusandae natus optio beatae nihil nisi, numquam doloremque eum sapiente cum rem! Sed non, quasi provident placeat nemo minima hic nobis possimus ex doloremque dolorum cupiditate obcaecati fugit reprehenderit earum quia nulla recusandae, itaque, commodi officiis architecto facere consequatur? Minima dignissimos beatae, quos reiciendis provident consectetur facilis adipisci iure odio. A quaerat, aliquid accusantium tempora sit quas iste vero blanditiis placeat necessitatibus deserunt libero soluta magnam fuga consequatur in. Officiis nesciunt consectetur, iusto pariatur quis distinctio. Deleniti, vitae repudiandae asperiores qui beatae quas, tenetur dolorem est iusto deserunt veritatis sit sapiente quaerat doloribus incidunt ab sunt. Recusandae, accusamus provident sint fugit id quam explicabo illum, fugiat velit itaque tempora magnam debitis dignissimos nemo autem earum veritatis beatae? Neque fuga officiis impedit repellendus pariatur ex, temporibus sunt ab incidunt in explicabo dolorem, dicta quibusdam a voluptate eveniet laborum illo culpa nemo sequi labore. Adipisci reiciendis voluptas sapiente odio incidunt atque fugit cupiditate debitis at dolore magnam sint aperiam culpa perspiciatis beatae in dolorum, quis aut repudiandae officia earum, excepturi nobis laboriosam eveniet. Voluptas veritatis corrupti nostrum aliquam adipisci fugiat animi accusantium quos praesentium amet explicabo, fuga et iste minus vel, reprehenderit accusamus sapiente eum modi. Accusantium culpa quod eius, unde aliquam aspernatur repellendus iste architecto necessitatibus dolor recusandae, inventore odio eum? Eum, impedit sint. Voluptatum ut perspiciatis, ipsum autem possimus natus, veniam quibusdam temporibus neque harum voluptates debitis cumque nemo! Ut nesciunt alias odit accusamus perferendis, dignissimos eum quas fuga facere reiciendis exercitationem error eius quis. Aperiam ad repellat id, officia neque dolore eligendi vel? Nobis incidunt asperiores odio sint quis nesciunt recusandae sapiente, id laborum dolorem repudiandae laudantium consequatur provident. Quo aut officia adipisci, sapiente ea neque esse animi omnis! Impedit, blanditiis cupiditate! Sit aliquid rem in voluptatibus. In ea dolorum vitae quibusdam molestias! Qui sint voluptas, sit rerum porro aperiam odio asperiores labore minus inventore amet necessitatibus, quas distinctio. Cupiditate, at corrupti eaque temporibus nam iusto modi blanditiis fuga impedit nihil maiores facilis ullam explicabo. Vitae labore rerum, quidem ipsam quisquam impedit fuga magnam veniam vel in recusandae adipisci tempore cumque? Quos id inventore quibusdam ratione quidem dolore assumenda, ea porro natus at modi eum velit rem ipsa non saepe maiores nihil illum aliquam officiis vitae? Est sint sequi, inventore reprehenderit pariatur voluptates tempora neque aut nemo, possimus quasi explicabo iste dignissimos deleniti soluta fugiat eveniet id aspernatur distinctio amet nulla doloribus eum! Vel possimus voluptatum dolor reiciendis sunt eos voluptates minus atque odio, dignissimos laboriosam pariatur maxime quidem culpa ratione consequatur qui ipsam dolores assumenda quos ipsa dolorum exercitationem est. Adipisci vitae provident nesciunt, quae sit reiciendis inventore veritatis architecto perferendis quam rerum minima eaque corporis corrupti! Nemo, vitae. Aliquam molestiae, deserunt ipsum optio nemo ea et, asperiores numquam distinctio sapiente dolorem! Quis, ut debitis. Culpa quis numquam nostrum eligendi nemo praesentium obcaecati temporibus aliquid cum tempore corporis totam aliquam quibusdam nesciunt autem ex quos, maiores assumenda consequuntur. Nesciunt illo, vel saepe fugit perferendis beatae dolorum consectetur nisi, nihil explicabo necessitatibus, sit incidunt tempore ducimus iure magni aperiam tempora esse est quaerat maiores labore eius eligendi? Quisquam dolor ab beatae eos! Voluptatibus voluptate qui dolorum, nesciunt minima modi repudiandae ad ipsam asperiores cum eligendi dolore laborum quos, iste aliquid doloribus assumenda, error sequi tempora? Facere architecto eligendi possimus autem. Consequatur vero enim velit excepturi, minus iure sit nemo voluptatibus recusandae consequuntur molestiae quibusdam et reprehenderit neque aspernatur expedita, quaerat quasi suscipit facilis fugit voluptas. Incidunt, asperiores beatae laudantium exercitationem suscipit excepturi id ipsa eveniet eos? Recusandae obcaecati cum optio, molestias autem, quos rerum ad id aut ullam perspiciatis suscipit possimus accusantium libero ratione quam? Incidunt eligendi quia repellat consectetur. Aspernatur numquam eius inventore, expedita culpa cupiditate dignissimos maxime consectetur autem minus cum dolor sed tenetur possimus fugiat odit. Fugit, aspernatur ratione aperiam dignissimos in tempore modi libero voluptatum nisi soluta doloremque voluptatibus? Molestiae autem repellat optio nihil nesciunt quia? Natus officiis molestiae sint quas possimus beatae libero, delectus nemo! Cupiditate officiis maxime iure laudantium tenetur mollitia, quia eveniet quam fugit incidunt velit et veniam repellendus sit illum. Expedita aperiam dicta dignissimos fugiat! Atque!
+                <Typography
+                    variant="body1"
+                    sx={{
+                        color: 'text.secondary',
+                        mb: 3
+                    }}
+                >
+                    Manage your customer relationships and track their journey
+                </Typography>
             </Box>
-        </PageChanger>
-    )
-}
 
-export default CustomersPage
+            {/* Statistics Cards */}
+            <Grid container spacing={3} sx={{ mb: 4 }}>
+                <Grid item xs={12} sm={6} md={3}>
+                    <Card sx={{
+                        height: '120px',
+                        boxShadow: 2,
+                        '&:hover': {
+                            boxShadow: 4,
+                            transform: 'translateY(-2px)',
+                            transition: 'all 0.3s ease'
+                        }
+                    }}>
+                        <CardContent sx={{ height: '100%', display: 'flex', alignItems: 'center' }}>
+                            <Box sx={{
+                                bgcolor: 'primary.main',
+                                borderRadius: 2,
+                                p: 1.5,
+                                display: 'flex',
+                                mr: 2,
+                                color: 'white'
+                            }}>
+                                <FiUsers size={24} />
+                            </Box>
+                            <Box>
+                                <Typography variant="h5" fontWeight="bold" color="text.primary">
+                                    {stats.totalCustomers}
+                                </Typography>
+                                <Typography variant="body2" color="text.secondary">
+                                    Total Customers
+                                </Typography>
+                            </Box>
+                        </CardContent>
+                    </Card>
+                </Grid>
+
+                <Grid item xs={12} sm={6} md={3}>
+                    <Card sx={{
+                        height: '120px',
+                        boxShadow: 2,
+                        '&:hover': {
+                            boxShadow: 4,
+                            transform: 'translateY(-2px)',
+                            transition: 'all 0.3s ease'
+                        }
+                    }}>
+                        <CardContent sx={{ height: '100%', display: 'flex', alignItems: 'center' }}>
+                            <Box sx={{
+                                bgcolor: 'success.main',
+                                borderRadius: 2,
+                                p: 1.5,
+                                display: 'flex',
+                                mr: 2,
+                                color: 'white'
+                            }}>
+                                <FiTrendingUp size={24} />
+                            </Box>
+                            <Box>
+                                <Typography variant="h5" fontWeight="bold" color="text.primary">
+                                    {stats.activeCustomers}
+                                </Typography>
+                                <Typography variant="body2" color="text.secondary">
+                                    Active Customers
+                                </Typography>
+                            </Box>
+                        </CardContent>
+                    </Card>
+                </Grid>
+
+                <Grid item xs={12} sm={6} md={3}>
+                    <Card sx={{
+                        height: '120px',
+                        boxShadow: 2,
+                        '&:hover': {
+                            boxShadow: 4,
+                            transform: 'translateY(-2px)',
+                            transition: 'all 0.3s ease'
+                        }
+                    }}>
+                        <CardContent sx={{ height: '100%', display: 'flex', alignItems: 'center' }}>
+                            <Box sx={{
+                                bgcolor: 'info.main',
+                                borderRadius: 2,
+                                p: 1.5,
+                                display: 'flex',
+                                mr: 2,
+                                color: 'white'
+                            }}>
+                                <FiDollarSign size={24} />
+                            </Box>
+                            <Box>
+                                <Typography variant="h5" fontWeight="bold" color="text.primary">
+                                    {formatCurrency(stats.totalRevenue)}
+                                </Typography>
+                                <Typography variant="body2" color="text.secondary">
+                                    Total Revenue
+                                </Typography>
+                            </Box>
+                        </CardContent>
+                    </Card>
+                </Grid>
+
+                <Grid item xs={12} sm={6} md={3}>
+                    <Card sx={{
+                        height: '120px',
+                        boxShadow: 2,
+                        '&:hover': {
+                            boxShadow: 4,
+                            transform: 'translateY(-2px)',
+                            transition: 'all 0.3s ease'
+                        }
+                    }}>
+                        <CardContent sx={{ height: '100%', display: 'flex', alignItems: 'center' }}>
+                            <Box sx={{
+                                bgcolor: 'warning.main',
+                                borderRadius: 2,
+                                p: 1.5,
+                                display: 'flex',
+                                mr: 2,
+                                color: 'white'
+                            }}>
+                                <FiShoppingBag size={24} />
+                            </Box>
+                            <Box>
+                                <Typography variant="h5" fontWeight="bold" color="text.primary">
+                                    {formatCurrency(stats.avgLifetimeValue)}
+                                </Typography>
+                                <Typography variant="body2" color="text.secondary">
+                                    Avg Lifetime Value
+                                </Typography>
+                            </Box>
+                        </CardContent>
+                    </Card>
+                </Grid>
+            </Grid>
+
+            {/* Main Customers Panel */}
+            <Paper sx={{
+                borderRadius: 2,
+                boxShadow: 3,
+                overflow: 'hidden'
+            }}>
+                {/* Header */}
+                <Box sx={{
+                    bgcolor: 'primary.main',
+                    color: 'primary.contrastText',
+                    p: 3
+                }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', mb: 3 }}>
+                        <Box>
+                            <Typography variant="h6" fontWeight="bold" sx={{ mb: 0.5 }}>
+                                Customer Directory
+                            </Typography>
+                            <Typography variant="body2" sx={{ opacity: 0.9 }}>
+                                {customers.length} customers registered
+                            </Typography>
+                        </Box>
+                        <Badge badgeContent={stats.activeCustomers} color="success">
+                            <Box sx={{
+                                bgcolor: 'primary.dark',
+                                borderRadius: 1,
+                                p: 1
+                            }}>
+                                <FiUserPlus size={20} />
+                            </Box>
+                        </Badge>
+                    </Box>
+
+                    {/* Filters */}
+                    <Stack
+                        direction={{ xs: 'column', md: 'row' }}
+                        spacing={2}
+                    >
+                        <TextField
+                            placeholder="Search customers..."
+                            value={searchTerm}
+                            onChange={(e) => setSearchTerm(e.target.value)}
+                            InputProps={{
+                                startAdornment: (
+                                    <InputAdornment position="start">
+                                        <FiSearch color="inherit" />
+                                    </InputAdornment>
+                                ),
+                            }}
+                            sx={{
+                                minWidth: 350,
+                                '& .MuiOutlinedInput-root': {
+                                    backgroundColor: 'rgba(255,255,255,0.15)',
+                                    color: 'inherit',
+                                    '& fieldset': { borderColor: 'rgba(255,255,255,0.3)' },
+                                    '&:hover fieldset': { borderColor: 'rgba(255,255,255,0.5)' },
+                                    '&.Mui-focused fieldset': { borderColor: 'rgba(255,255,255,0.7)' }
+                                },
+                                '& .MuiOutlinedInput-input::placeholder': {
+                                    color: 'rgba(255,255,255,0.7)',
+                                    opacity: 1
+                                }
+                            }}
+                        />
+
+                        <FormControl sx={{ minWidth: 120 }}>
+                            <Select
+                                value={tierFilter}
+                                onChange={(e) => setTierFilter(e.target.value)}
+                                displayEmpty
+                                sx={{
+                                    backgroundColor: 'rgba(255,255,255,0.15)',
+                                    color: 'inherit',
+                                    '& .MuiOutlinedInput-notchedOutline': {
+                                        borderColor: 'rgba(255,255,255,0.3)'
+                                    },
+                                    '& .MuiSvgIcon-root': { color: 'inherit' },
+                                    '&:hover .MuiOutlinedInput-notchedOutline': {
+                                        borderColor: 'rgba(255,255,255,0.5)'
+                                    }
+                                }}
+                            >
+                                <MenuItem value="all">All Tiers</MenuItem>
+                                <MenuItem value="Premium">Premium</MenuItem>
+                                <MenuItem value="Gold">Gold</MenuItem>
+                                <MenuItem value="Silver">Silver</MenuItem>
+                                <MenuItem value="Bronze">Bronze</MenuItem>
+                            </Select>
+                        </FormControl>
+
+                        <FormControl sx={{ minWidth: 120 }}>
+                            <Select
+                                value={statusFilter}
+                                onChange={(e) => setStatusFilter(e.target.value)}
+                                displayEmpty
+                                sx={{
+                                    backgroundColor: 'rgba(255,255,255,0.15)',
+                                    color: 'inherit',
+                                    '& .MuiOutlinedInput-notchedOutline': {
+                                        borderColor: 'rgba(255,255,255,0.3)'
+                                    },
+                                    '& .MuiSvgIcon-root': { color: 'inherit' },
+                                    '&:hover .MuiOutlinedInput-notchedOutline': {
+                                        borderColor: 'rgba(255,255,255,0.5)'
+                                    }
+                                }}
+                            >
+                                <MenuItem value="all">All Status</MenuItem>
+                                <MenuItem value="Active">Active</MenuItem>
+                                <MenuItem value="Inactive">Inactive</MenuItem>
+                            </Select>
+                        </FormControl>
+
+                        <Box sx={{ flexGrow: 1 }} />
+
+                        <Button
+                            variant="outlined"
+                            startIcon={<FiFilter />}
+                            sx={{
+                                borderColor: 'rgba(255,255,255,0.5)',
+                                color: 'inherit',
+                                '&:hover': {
+                                    borderColor: 'rgba(255,255,255,0.8)',
+                                    backgroundColor: 'rgba(255,255,255,0.1)'
+                                }
+                            }}
+                        >
+                            Filters
+                        </Button>
+
+                        <Button
+                            variant="contained"
+                            startIcon={<FiDownload />}
+                            sx={{
+                                bgcolor: 'common.white',
+                                color: 'primary.main',
+                                '&:hover': {
+                                    bgcolor: 'grey.100'
+                                }
+                            }}
+                        >
+                            Export
+                        </Button>
+                    </Stack>
+                </Box>
+
+                {/* Customers Table */}
+                <TableContainer>
+                    <Table>
+                        <TableHead>
+                            <TableRow sx={{
+                                bgcolor: 'grey.50',
+                                '& .MuiTableCell-head': {
+                                    fontWeight: 600,
+                                    color: 'text.primary',
+                                    py: 2
+                                }
+                            }}>
+                                <TableCell>Customer</TableCell>
+                                <TableCell>Contact Info</TableCell>
+                                <TableCell>Tier & Status</TableCell>
+                                <TableCell>Order Stats</TableCell>
+                                <TableCell align="right">Lifetime Value</TableCell>
+                                <TableCell>Last Activity</TableCell>
+                                <TableCell align="center">Actions</TableCell>
+                            </TableRow>
+                        </TableHead>
+                        <TableBody>
+                            {customers.map((customer, index) => (
+                                <TableRow
+                                    key={customer.id}
+                                    sx={{
+                                        '&:hover': {
+                                            backgroundColor: 'action.hover'
+                                        },
+                                        '& .MuiTableCell-root': {
+                                            py: 2
+                                        }
+                                    }}
+                                >
+                                    <TableCell>
+                                        <Box sx={{ display: 'flex', alignItems: 'center' }}>
+                                            <Box sx={{ position: 'relative', mr: 2 }}>
+                                                <Avatar
+                                                    sx={{
+                                                        width: 48,
+                                                        height: 48,
+                                                        bgcolor: 'primary.main'
+                                                    }}
+                                                >
+                                                    {customer.name.split(' ').map(n => n[0]).join('')}
+                                                </Avatar>
+                                                {customer.tier === 'Premium' && (
+                                                    <Box sx={{
+                                                        position: 'absolute',
+                                                        bottom: -2,
+                                                        right: -2,
+                                                        bgcolor: 'warning.main',
+                                                        borderRadius: '50%',
+                                                        p: 0.25,
+                                                        display: 'flex',
+                                                        alignItems: 'center',
+                                                        justifyContent: 'center',
+                                                        border: 2,
+                                                        borderColor: 'background.paper'
+                                                    }}>
+                                                        <FiStar size={12} />
+                                                    </Box>
+                                                )}
+                                            </Box>
+                                            <Box>
+                                                <Typography variant="body1" fontWeight="600" sx={{ mb: 0.5 }}>
+                                                    {customer.name}
+                                                </Typography>
+                                                <Box sx={{ display: 'flex', gap: 0.5, flexWrap: 'wrap' }}>
+                                                    {customer.tags.map((tag, idx) => (
+                                                        <Chip
+                                                            key={idx}
+                                                            label={tag}
+                                                            size="small"
+                                                            variant="outlined"
+                                                            sx={{ fontSize: '0.7rem', height: 20 }}
+                                                        />
+                                                    ))}
+                                                </Box>
+                                            </Box>
+                                        </Box>
+                                    </TableCell>
+
+                                    <TableCell>
+                                        <Box>
+                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
+                                                <FiMail size={14} />
+                                                <Typography variant="body2" color="text.secondary">
+                                                    {customer.email}
+                                                </Typography>
+                                            </Box>
+                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
+                                                <FiPhone size={14} />
+                                                <Typography variant="body2" color="text.secondary">
+                                                    {customer.phone}
+                                                </Typography>
+                                            </Box>
+                                            <Box sx={{ display: 'flex', alignItems: 'center', gap: 1 }}>
+                                                <FiMapPin size={14} />
+                                                <Typography variant="body2" color="text.secondary">
+                                                    {customer.location}
+                                                </Typography>
+                                            </Box>
+                                        </Box>
+                                    </TableCell>
+
+                                    <TableCell>
+                                        <Stack spacing={1}>
+                                            <Chip
+                                                label={customer.tier}
+                                                color={getTierColor(customer.tier)}
+                                                size="small"
+                                                variant="outlined"
+                                            />
+                                            <Chip
+                                                label={customer.status}
+                                                color={getStatusColor(customer.status)}
+                                                size="small"
+                                                variant="filled"
+                                            />
+                                        </Stack>
+                                    </TableCell>
+
+                                    <TableCell>
+                                        <Box>
+                                            <Typography variant="body2" fontWeight="600" sx={{ mb: 0.5 }}>
+                                                {customer.totalOrders} orders
+                                            </Typography>
+                                            <Typography variant="caption" color="text.secondary" sx={{ display: 'block', mb: 0.5 }}>
+                                                Avg: {formatCurrency(customer.avgOrderValue)}
+                                            </Typography>
+                                            <LinearProgress
+                                                variant="determinate"
+                                                value={Math.min((customer.totalOrders / 30) * 100, 100)}
+                                                color="primary"
+                                                sx={{ height: 4, borderRadius: 1 }}
+                                            />
+                                        </Box>
+                                    </TableCell>
+
+                                    <TableCell align="right">
+                                        <Typography variant="h6" fontWeight="600" sx={{ mb: 0.5 }}>
+                                            {formatCurrency(customer.totalSpent)}
+                                        </Typography>
+                                        <Typography variant="caption" color="text.secondary">
+                                            Since {formatDate(customer.joinDate)}
+                                        </Typography>
+                                    </TableCell>
+
+                                    <TableCell>
+                                        <Box sx={{ display: 'flex', alignItems: 'center', gap: 1, mb: 0.5 }}>
+                                            <FiCalendar size={14} />
+                                            <Typography variant="body2" color="text.secondary">
+                                                {formatDate(customer.lastOrder)}
+                                            </Typography>
+                                        </Box>
+                                        <Typography variant="caption" color="text.secondary">
+                                            Last order
+                                        </Typography>
+                                    </TableCell>
+
+                                    <TableCell align="center">
+                                        <Stack direction="row" spacing={0.5} justifyContent="center">
+                                            <Tooltip title="View Profile">
+                                                <IconButton
+                                                    size="small"
+                                                    color="primary"
+                                                >
+                                                    <FiEye size={16} />
+                                                </IconButton>
+                                            </Tooltip>
+                                            <Tooltip title="Send Email">
+                                                <IconButton
+                                                    size="small"
+                                                    color="info"
+                                                >
+                                                    <FiMail size={16} />
+                                                </IconButton>
+                                            </Tooltip>
+                                            <Tooltip title="More Actions">
+                                                <IconButton
+                                                    size="small"
+                                                >
+                                                    <FiMoreVertical size={16} />
+                                                </IconButton>
+                                            </Tooltip>
+                                        </Stack>
+                                    </TableCell>
+                                </TableRow>
+                            ))}
+                        </TableBody>
+                    </Table>
+                </TableContainer>
+
+                {/* Pagination Footer */}
+                <Box sx={{
+                    p: 2,
+                    borderTop: 1,
+                    borderColor: 'divider',
+                    bgcolor: 'grey.50'
+                }}>
+                    <Box sx={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center' }}>
+                        <Typography variant="body2" color="text.secondary">
+                            Showing 1-{customers.length} of {customers.length} customers
+                        </Typography>
+                        <Stack direction="row" spacing={1}>
+                            <Button
+                                size="small"
+                                variant="outlined"
+                                disabled
+                            >
+                                Previous
+                            </Button>
+                            <Button
+                                size="small"
+                                variant="contained"
+                            >
+                                1
+                            </Button>
+                            <Button
+                                size="small"
+                                variant="outlined"
+                                disabled
+                            >
+                                Next
+                            </Button>
+                        </Stack>
+                    </Box>
+                </Box>
+            </Paper>
+        </Box>
+    );
+}

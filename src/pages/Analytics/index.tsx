@@ -6,7 +6,7 @@ import SalesCategory from "./components/SalesCategory";
 import Stats from "./components/Stats";
 import Header from "./components/Header";
 
-const Landing = () => {
+const AnalyticsPage = () => {
     return (
         <Box
             sx={{
@@ -36,4 +36,4 @@ const Landing = () => {
     );
 };
 
-export default Landing;
+export default AnalyticsPage;

@@ -1,27 +1,31 @@
 // type for our default state
 export type DefaultState = {
-  count: number;
+  user: null | {
+    id: number;
+    email: string;
+    name: string;
+  };
   theme: "dark" | "light";
-  status: string;
 };
 
-// Types for all the possible actions
-export type UpdateCountAction = {
-  type: "increment" | "decrement" | "reset";
-};
-export type SetStatusAction = {
-  type: "setStatus";
-  payload: "active" | "inactive";
-};
+// types for all the possible actions
 export type SetThemeAction = {
   type: "setTheme";
   payload: "light" | "dark";
 };
+export type SetUser = {
+  type: "setUser";
+  payload: {
+    id: number;
+    email: string;
+    name: string;
+  } | null;
+};
 
-// Union type for all the actions
-export type ActionType = UpdateCountAction | SetStatusAction | SetThemeAction;
+// union type for all the actions
+export type ActionType = SetUser | SetThemeAction;
 
-// This is the type of our context which we provide as type of our context.
+// this is the type of our context which we provide as type of our context.
 export type TypeContext = DefaultState & {
   dispatch: React.Dispatch<ActionType>;
 };

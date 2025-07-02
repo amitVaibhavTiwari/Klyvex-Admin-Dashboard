@@ -21,7 +21,7 @@ export const routes: RouteItem[] = [
         name: 'Analytics',
         icon: FiShoppingBag,
         subRoutes: [
-            { name: 'Customer Analytics', path: '/customer-analytics' },
+            { name: 'Store Analytics', path: '/analytics' },
             { name: 'Order Analytics', path: '/order-analytics' },
             { name: 'Revenue Analytics', path: '/revenue-analytics' }
         ]
@@ -30,5 +30,5 @@ export const routes: RouteItem[] = [
     { name: 'Orders', icon: FiShoppingCart, path: '/orders' },
     { name: 'Products', path: '/products', icon: FiDollarSign },
     { name: 'Stock', path: '/stock', icon: FiMessageCircle },
-    { name: 'Storefront', path: '/storefront', icon: FiActivity },
+    { name: 'Staff', path: '/staff', icon: FiActivity },
 ];

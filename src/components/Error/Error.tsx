@@ -44,7 +44,7 @@ const Error = () => {
                             ? "The page you are looking for is either missing or you assembled the link incorrectly."
                             : `Something went unexpectedly wrong. Refresh the page or try again later. If the problem continues, contact support.`}
                     </Typography>
-                    {/* error image, add later */}
+                    {/* error image, will add later */}
                     {/* <Box
                         component="img"
                         src="/error.png"
