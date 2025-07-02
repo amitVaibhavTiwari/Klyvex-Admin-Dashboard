@@ -34,18 +34,23 @@ const AppProvider: React.FC<React.PropsWithChildren<{}>> = ({ children }) => {
     };
 
     const getUserDetails = async () => {
-        const resp = await api.get("/staff/get-self-details");
-        if (resp?.data?.data?.user) {
-            dispatch({
-                type: "setUser",
-                payload: {
-                    email: resp?.data?.data?.user.email,
-                    id: resp?.data?.data?.user.id,
-                    name: resp?.data?.data?.user.name,
-                },
-            });
+        try {
+            const resp = await api.get("/staff/get-self-details");
+            if (resp?.data?.data?.user) {
+                dispatch({
+                    type: "setUser",
+                    payload: {
+                        email: resp?.data?.data?.user.email,
+                        id: resp?.data?.data?.user.id,
+                        name: resp?.data?.data?.user.name,
+                    },
+                });
+            }
+        } catch (error) {
+            console.log(error);
+        } finally {
+            setProcessing(false);
         }
-        setProcessing(false);
     };
 
     useEffect(() => {

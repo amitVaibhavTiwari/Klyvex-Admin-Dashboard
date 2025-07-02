@@ -16,13 +16,13 @@ import ProductsPage from "./pages/Products";
 import AddProductPage from "./pages/AddProduct";
 import LoginPage from "./pages/Login";
 import LandingPage from "./pages/Landing";
-import AnalyticsPage from "./pages/analytics";
+import AnalyticsPage from "./pages/Analytics";
 
 const App = () => {
   const queryClient = new QueryClient({
     defaultOptions: {
       queries: {
-        staleTime: 1000 * 30 * 60, //half hr
+        staleTime: 1000 * 30 * 60, // half hr
       },
     },
   });
